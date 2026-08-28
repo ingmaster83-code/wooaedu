@@ -1,0 +1,139 @@
+---
+layout: default
+---
+
+<div class="page-with-sidebar">
+<div class="region-page">
+
+  <nav class="breadcrumb" aria-label="위치">
+    <a href="/">홈</a>
+    <span>›</span>
+    <span>{{ page.do_name }}</span>
+  </nav>
+
+  <div class="region-page-header">
+    <h1>🎓 {{ page.title_h1 }}</h1>
+    <p>{{ page.subtitle }}</p>
+  </div>
+
+  <!-- 광고 -->
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  <!-- 필터 -->
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all" onclick="filterFacilities('all', this)">전체</button>
+    <button class="filter-btn" data-filter="offline" onclick="filterFacilities('offline', this)">📍 오프라인</button>
+    <button class="filter-btn" data-filter="remote" onclick="filterFacilities('remote', this)">💻 원격·온라인</button>
+    <button class="filter-btn" data-filter="acbg" onclick="filterFacilities('acbg', this)">🎓 학력인정</button>
+  </div>
+
+  <p id="campCount" style="font-size:.87rem;color:#6B7280;margin-bottom:16px;"></p>
+
+  <div class="camp-grid" id="campGrid">
+    <p style="color:#6B7280;">로딩 중...</p>
+  </div>
+
+  <!-- 이 지역 평생학습 강좌 (보조정보 - 검색엔진 아님) -->
+  <div id="courseSection" style="display:none;margin-top:48px;">
+    <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">📚 {{ page.do_name }} 평생학습 강좌 모집 현황</h2>
+    <p style="color:#6B7280;font-size:.88rem;margin-bottom:16px;">
+      아래는 최근 등록된 강좌 일부입니다. 전체 강좌 검색은 국가평생학습포털
+      <a href="https://www.lifelongedu.go.kr" target="_blank" rel="noopener">늘배움</a>에서 하실 수 있습니다.
+    </p>
+    <div id="courseList" style="display:grid;gap:10px;"></div>
+  </div>
+
+  <!-- 안내 텍스트 -->
+  <div style="margin-top:40px;background:#F9FAFB;border-radius:14px;padding:24px 28px;">
+    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:12px;">{{ page.do_name }} 평생교육시설 이용 안내</h2>
+    <p style="color:#374151;line-height:1.8;font-size:.9375rem;margin-bottom:16px;">
+      {{ page.do_name }}의 평생교육원·문화센터·원격평생교육시설을 오프라인/원격, 학력인정 여부로 검색할 수 있습니다.
+      모든 정보는 교육부·시도교육청이 제공하는 전국평생교육시설정보표준데이터를 기반으로 합니다.
+    </p>
+    <details style="margin-bottom:10px;">
+      <summary style="cursor:pointer;font-weight:600;padding:6px 0;">"등록상태 확인 필요"는 무슨 뜻인가요?</summary>
+      <p style="padding:6px 0 4px;color:#374151;line-height:1.7;">일부 지자체는 등록상태 필드를 비워둔 채 데이터를 제출합니다. 폐원·휴원으로 명시된 곳은 목록에서 제외했지만, 상태가 비어 있는 곳은 실제 운영 여부를 전화로 다시 확인하시길 권장합니다.</p>
+    </details>
+    <details>
+      <summary style="cursor:pointer;font-weight:600;padding:6px 0;">학력인정이란 무엇인가요?</summary>
+      <p style="padding:6px 0 4px;color:#374151;line-height:1.7;">일부 평생교육시설은 이수 시 초·중·고 학력으로 인정받을 수 있는 과정을 운영합니다. "학력인정" 표시가 있는 시설은 관련 법령에 따라 학력 인정 과정을 운영 중인 곳입니다.</p>
+    </details>
+  </div>
+
+</div>
+<aside class="tool-sidebar"></aside>
+</div>
+
+<script>
+const DO_NAME = {{ page.do_name | jsonify }};
+let allFacilities = [];
+
+(async () => {
+  const resp = await fetch('/search_index.json');
+  const all  = await resp.json();
+  allFacilities = all.filter(f => f.doShort === DO_NAME);
+  document.getElementById('campCount').textContent = `총 ${allFacilities.length}개 평생교육시설`;
+  renderFacilities(allFacilities);
+})();
+
+(async () => {
+  try {
+    const resp = await fetch('/region_courses.json');
+    const data = await resp.json();
+    const doData = data[DO_NAME];
+    if (!doData) return;
+    const merged = [];
+    Object.keys(doData).forEach(sgg => {
+      (doData[sgg].sample || []).forEach(c => merged.push(Object.assign({sigungu: sgg}, c)));
+    });
+    if (merged.length === 0) return;
+    document.getElementById('courseSection').style.display = 'block';
+    document.getElementById('courseList').innerHTML = merged.slice(0, 10).map(c => `
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:12px 16px;">
+        <div style="font-weight:700;font-size:.92rem;">${c.name}</div>
+        <div style="font-size:.82rem;color:#6B7280;margin-top:4px;">📍 ${c.sigungu} · ${c.org || ''}${c.start ? ' · ' + c.start + '~' + (c.end||'') : ''}</div>
+      </div>`).join('');
+  } catch(e) {}
+})();
+
+function facilityCard(f) {
+  return `<a class="camp-card" href="/facility/${f.slug}/">
+    <div class="camp-card-img-placeholder">🎓</div>
+    <div class="camp-card-body">
+      <div class="camp-card-name">${f.orgName}</div>
+      <div class="camp-card-loc">📍 ${f.sigungu || ''}</div>
+      <div class="camp-card-tags">
+        ${f.type ? `<span class="tag tag-type">${f.type}</span>` : ''}
+        ${f.isRemote ? `<span class="tag tag-env">💻 원격</span>` : ''}
+        ${f.acbgYn === 'Y' ? `<span class="tag tag-safe">🎓 학력인정</span>` : ''}
+      </div>
+    </div>
+  </a>`;
+}
+
+function filterFacilities(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  let filtered = allFacilities;
+  if (type === 'offline') {
+    filtered = allFacilities.filter(f => !f.isRemote);
+  } else if (type === 'remote') {
+    filtered = allFacilities.filter(f => f.isRemote);
+  } else if (type === 'acbg') {
+    filtered = allFacilities.filter(f => f.acbgYn === 'Y');
+  }
+  document.getElementById('campCount').textContent = `총 ${filtered.length}개 평생교육시설`;
+  renderFacilities(filtered);
+}
+
+function renderFacilities(facilities) {
+  const grid = document.getElementById('campGrid');
+  if (facilities.length === 0) {
+    grid.innerHTML = '<p style="color:#6B7280;grid-column:1/-1;">해당 조건의 시설이 없습니다.</p>';
+    return;
+  }
+  grid.innerHTML = facilities.map(facilityCard).join('');
+}
+</script>

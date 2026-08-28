@@ -1,0 +1,192 @@
+---
+layout: default
+title: 전국 평생교육시설 정보 검색
+description: 전국 평생교육원·문화센터·원격평생교육시설의 교육청 등록 정보를 이름 또는 지역으로 검색. 정식 등록 여부, 주소, 연락처, 학력인정 여부를 확인하세요.
+---
+
+<!-- 히어로 & 검색 -->
+<div class="hero">
+  <h1>🎓 우리 평생교육원, 정식 등록된 곳일까요?</h1>
+  <p>기관명 또는 지역으로 교육청 등록 정보를 확인하세요</p>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" class="search-input"
+           placeholder="예) OO평생교육원, 강남구, 원격..."
+           autocomplete="off" aria-label="평생교육시설 검색">
+    <button class="search-btn" onclick="doSearch()">🔍 검색</button>
+  </div>
+</div>
+
+<div class="page-with-sidebar">
+<div>
+<!-- 검색 결과 -->
+<div id="search-results"></div>
+
+<!-- 광고 -->
+<div class="top-ad-bar">
+  {% include ad.html %}
+</div>
+
+<!-- 소개 -->
+<div class="section" style="padding-bottom:0;">
+  <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:14px;padding:20px 24px;">
+    <p style="color:#1E3A8A;line-height:1.8;font-size:.92rem;">
+      💡 <strong>수강료를 내기 전에 확인하세요.</strong> 「평생교육법」에 따라 교육청에 정식 등록된 평생교육시설인지,
+      학력인정 과정인지 여부를 등록번호 없이도 기관명 검색만으로 바로 확인할 수 있습니다.
+      전국 <strong id="totalCount">-</strong>개 시설 정보를 교육부·시도교육청 공공데이터 기반으로 제공합니다.
+    </p>
+  </div>
+</div>
+
+<!-- 지역별 찾기 -->
+<div class="section">
+  <h2 class="section-title">📍 지역별 평생교육시설 찾기</h2>
+  <div class="region-grid">
+    <a href="/region/서울/" class="region-btn"><span class="region-icon">🏙️</span>서울<span class="region-count"></span></a>
+    <a href="/region/경기/" class="region-btn"><span class="region-icon">🌆</span>경기<span class="region-count"></span></a>
+    <a href="/region/인천/" class="region-btn"><span class="region-icon">⚓</span>인천<span class="region-count"></span></a>
+    <a href="/region/부산/" class="region-btn"><span class="region-icon">🌅</span>부산<span class="region-count"></span></a>
+    <a href="/region/대구/" class="region-btn"><span class="region-icon">🍑</span>대구<span class="region-count"></span></a>
+    <a href="/region/광주/" class="region-btn"><span class="region-icon">🎨</span>광주<span class="region-count"></span></a>
+    <a href="/region/대전/" class="region-btn"><span class="region-icon">🏛️</span>대전<span class="region-count"></span></a>
+    <a href="/region/울산/" class="region-btn"><span class="region-icon">🏭</span>울산<span class="region-count"></span></a>
+    <a href="/region/세종/" class="region-btn"><span class="region-icon">🌿</span>세종<span class="region-count"></span></a>
+    <a href="/region/강원/" class="region-btn"><span class="region-icon">🏔️</span>강원<span class="region-count"></span></a>
+    <a href="/region/충북/" class="region-btn"><span class="region-icon">📖</span>충북<span class="region-count"></span></a>
+    <a href="/region/충남/" class="region-btn"><span class="region-icon">🌊</span>충남<span class="region-count"></span></a>
+    <a href="/region/전북/" class="region-btn"><span class="region-icon">🌾</span>전북<span class="region-count"></span></a>
+    <a href="/region/전남/" class="region-btn"><span class="region-icon">🐚</span>전남<span class="region-count"></span></a>
+    <a href="/region/경북/" class="region-btn"><span class="region-icon">🍎</span>경북<span class="region-count"></span></a>
+    <a href="/region/경남/" class="region-btn"><span class="region-icon">🎋</span>경남<span class="region-count"></span></a>
+    <a href="/region/제주/" class="region-btn"><span class="region-icon">🌺</span>제주<span class="region-count"></span></a>
+  </div>
+</div>
+
+<!-- 유형별 찾기 -->
+<div style="background:white;">
+<div class="section" style="padding-top:40px;padding-bottom:40px;">
+    <h2 class="section-title">🎓 유형별 평생교육시설</h2>
+    <div class="type-grid" style="grid-template-columns:repeat(3,1fr);">
+      <a href="/search/?q=지식인력개발" class="type-card">
+        <span class="type-icon">🏢</span>
+        <div class="type-name">지식·인력개발</div>
+        <div class="type-count" id="cnt-지식인력개발형태"></div>
+      </a>
+      <a href="/search/?q=원격" class="type-card">
+        <span class="type-icon">💻</span>
+        <div class="type-name">원격·온라인</div>
+        <div class="type-count" id="cnt-remote"></div>
+      </a>
+      <a href="/search/?q=학교" class="type-card">
+        <span class="type-icon">🏫</span>
+        <div class="type-name">학교형태·부설</div>
+        <div class="type-count" id="cnt-학교"></div>
+      </a>
+    </div>
+</div>
+</div>
+
+<!-- 학력인정 시설 -->
+<div class="section">
+  <h2 class="section-title">🎓 학력인정 평생교육시설 <span id="acbgCount" style="font-size:.85rem;color:#6B7280;font-weight:400;"></span></h2>
+  <p style="color:#6B7280;margin-bottom:20px;font-size:.92rem;">이수 시 초·중·고 학력으로 인정받을 수 있는 과정을 운영하는 시설입니다.</p>
+  <div class="camp-grid" id="acbgFacilities">
+    <p style="color:#6B7280;">로딩 중...</p>
+  </div>
+</div>
+
+</div>
+<aside class="tool-sidebar"></aside>
+</div>
+
+<!-- Fuse.js 검색 -->
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script>
+let fuseIndex = null;
+let fuse = null;
+
+async function loadIndex() {
+  if (fuseIndex) return;
+  const resp = await fetch('/search_index.json');
+  fuseIndex = await resp.json();
+  document.getElementById('totalCount').textContent = fuseIndex.length.toLocaleString();
+  fuse = new Fuse(fuseIndex, {
+    keys: ['orgName', 'doShort', 'sigungu', 'addr', 'type'],
+    threshold: 0.3,
+    minMatchCharLength: 1,
+  });
+  updateCounts();
+  renderAcbg();
+}
+
+function updateCounts() {
+  if (!fuseIndex) return;
+  document.getElementById('cnt-지식인력개발형태').textContent = fuseIndex.filter(f => f.type === '지식인력개발형태').length + '개';
+  document.getElementById('cnt-remote').textContent = fuseIndex.filter(f => f.isRemote).length + '개';
+  document.getElementById('cnt-학교').textContent = fuseIndex.filter(f => (f.type||'').includes('학교')).length + '개';
+}
+
+function renderAcbg() {
+  if (!fuseIndex) return;
+  const acbg = fuseIndex.filter(f => f.acbgYn === 'Y');
+  document.getElementById('acbgCount').textContent = `총 ${acbg.length}곳`;
+  document.getElementById('acbgFacilities').innerHTML = acbg.slice(0, 12).map(itemCard).join('');
+}
+
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) { document.getElementById('search-results').innerHTML = ''; return; }
+  loadIndex().then(() => {
+    const results = fuse ? fuse.search(q).slice(0, 20) : [];
+    const el = document.getElementById('search-results');
+    if (results.length === 0) {
+      el.innerHTML = '<p style="text-align:center;padding:20px;color:#6B7280;">검색 결과가 없습니다. 시설명 일부 또는 지역명으로 다시 검색해보세요.</p>';
+      return;
+    }
+    el.innerHTML = `<div style="max-width:960px;margin:0 auto;padding:0 20px;">
+      <p style="padding:8px 0;font-size:.9rem;color:#6B7280;">"${q}" 검색 결과 ${results.length}개</p>
+      ${results.map(r => searchResultItem(r.item)).join('')}
+    </div>`;
+    el.scrollIntoView({ behavior: 'smooth' });
+  });
+}
+
+function itemCard(f) {
+  return `<a class="camp-card" href="/facility/${f.slug}/">
+    <div class="camp-card-img-placeholder">🎓</div>
+    <div class="camp-card-body">
+      <div class="camp-card-name">${f.orgName}</div>
+      <div class="camp-card-loc">📍 ${f.sigungu || f.doShort || ''}</div>
+      <div class="camp-card-tags">
+        ${f.type ? `<span class="tag tag-type">${f.type}</span>` : ''}
+        ${f.acbgYn === 'Y' ? `<span class="tag tag-safe">🎓 학력인정</span>` : ''}
+      </div>
+    </div>
+  </a>`;
+}
+
+function searchResultItem(f) {
+  return `<div class="search-result-item">
+    <a href="/facility/${f.slug}/">
+      <div class="search-result-thumb" style="background:#DBEAFE;display:flex;align-items:center;justify-content:center;font-size:1.5rem;border-radius:6px;">🎓</div>
+      <div>
+        <div class="search-result-name">${f.orgName}</div>
+        <div class="search-result-loc">📍 ${f.doShort || ''} ${f.sigungu || ''}</div>
+        ${f.type ? `<span class="search-result-tag">${f.type}</span>` : ''}
+        ${f.status !== '개원' ? `<span class="search-result-tag" style="background:#fef3c7;color:#92400e;">등록상태 확인 필요</span>` : ''}
+      </div>
+    </a>
+  </div>`;
+}
+
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+loadIndex();
+
+const urlQ = new URLSearchParams(location.search).get('q');
+if (urlQ) {
+  document.getElementById('searchInput').value = urlQ;
+  loadIndex().then(doSearch);
+}
+</script>

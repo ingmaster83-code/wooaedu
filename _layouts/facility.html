@@ -1,0 +1,188 @@
+---
+layout: default
+---
+
+<div class="page-with-sidebar">
+<div class="camp-page">
+
+  <!-- 브레드크럼 -->
+  <nav class="breadcrumb" aria-label="위치">
+    <a href="/">홈</a>
+    <span>›</span>
+    <a href="/region/{{ page.doShort | uri_escape }}/">{{ page.doShort }}</a>
+    <span>›</span>
+    <span>{{ page.orgName }}</span>
+  </nav>
+
+  <div class="gallery" id="gallery">
+    <div class="gallery-placeholder">🎓</div>
+  </div>
+
+  <!-- 헤더 -->
+  <div class="camp-header">
+    <div class="camp-tags">
+      {% if page.type and page.type != "" %}
+      <span class="tag tag-type">{{ page.type }}</span>
+      {% endif %}
+      {% if page.isRemote %}
+      <span class="tag tag-env">💻 원격·온라인</span>
+      {% else %}
+      <span class="tag tag-env">📍 오프라인 시설</span>
+      {% endif %}
+      {% if page.status == "개원" %}
+      <span class="tag tag-safe">✅ 개원</span>
+      {% else %}
+      <span class="tag tag-warn">⚠️ 등록상태 확인 필요</span>
+      {% endif %}
+      {% if page.acbgYn == "Y" %}
+      <span class="tag tag-safe">🎓 학력인정{% if page.acbgYr and page.acbgYr != "" %}({{ page.acbgYr }}){% endif %}</span>
+      {% endif %}
+    </div>
+    <h1 class="camp-title">{{ page.orgName }}</h1>
+    {% if page.addr and page.addr != "" %}
+    <div class="camp-info-row">
+      <span class="camp-info-icon">📍</span>
+      <span>{{ page.addr }}</span>
+    </div>
+    {% endif %}
+    {% if page.tel and page.tel != "" %}
+    <div class="camp-info-row">
+      <span class="camp-info-icon">📞</span>
+      <a href="tel:{{ page.tel }}">{{ page.tel }}</a>
+    </div>
+    {% endif %}
+    {% if page.eduOffice and page.eduOffice != "" %}
+    <div class="camp-info-row">
+      <span class="camp-info-icon">🏛️</span>
+      <span>관할 교육지원청: {{ page.eduOffice }}</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- 광고 -->
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  <!-- 정부 등록 정보 -->
+  <div class="camp-section trust-box">
+    <h2>🏛️ 정부 등록 정보</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:.92rem;">
+      <tr><td style="padding:8px 0;color:#6B7280;width:130px;">시설 구분</td><td>{{ page.type }}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280;">등록 상태</td><td>{% if page.status == "개원" %}개원(운영 중){% else %}데이터에 상태 정보 없음 — 운영 여부는 기관에 직접 확인하세요{% endif %}</td></tr>
+      {% if page.regDate and page.regDate != "" %}
+      <tr><td style="padding:8px 0;color:#6B7280;">등록일자</td><td>{{ page.regDate }}</td></tr>
+      {% endif %}
+      {% if page.founder and page.founder != "" %}
+      <tr><td style="padding:8px 0;color:#6B7280;">설립자/운영자</td><td>{{ page.founder }}</td></tr>
+      {% endif %}
+      <tr><td style="padding:8px 0;color:#6B7280;">학력인정 여부</td><td>{% if page.acbgYn == "Y" %}인정{% if page.acbgYr and page.acbgYr != "" %} ({{ page.acbgYr }}년~){% endif %}{% else %}미인정{% endif %}</td></tr>
+      {% if page.crtrYmd and page.crtrYmd != "" %}
+      <tr><td style="padding:8px 0;color:#6B7280;">데이터 기준일</td><td>{{ page.crtrYmd }}</td></tr>
+      {% endif %}
+    </table>
+    <p style="font-size:.82rem;color:#9CA3AF;margin-top:10px;">
+      「평생교육법」에 따라 교육청에 등록된 정보입니다. 등록되어 있다고 해서 프로그램의 품질을 보증하지는 않으니, 수강료를 내기 전 반드시 후기와 계약조건을 함께 확인하세요.
+    </p>
+  </div>
+
+  {% if page.addr and page.addr != "" %}
+  <!-- 지도 -->
+  <div class="camp-section">
+    <h2>🗺️ 위치</h2>
+    <div id="map" style="width:100%;height:280px;border-radius:10px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;color:#9CA3AF;">지도를 불러오는 중...</div>
+    <a href="https://map.kakao.com/?q={{ page.addr | uri_escape }}" class="reserve-btn secondary" style="margin-top:12px;display:block;">🗺️ 카카오맵에서 크게 보기</a>
+  </div>
+  {% endif %}
+
+  <!-- 홈페이지 -->
+  {% if page.homepage and page.homepage != "" %}
+  <div class="camp-section">
+    <a href="{{ page.homepage }}" target="_blank" rel="noopener nofollow" class="reserve-btn">
+      🌐 공식 홈페이지 방문
+    </a>
+  </div>
+  {% endif %}
+
+  <!-- 광고 -->
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  <!-- 같은 지역 시설 -->
+  <div class="region-camps">
+    <h2>📍 {{ page.doShort }} 다른 평생교육시설</h2>
+    <div id="regionCampsGrid" class="camp-grid"></div>
+    <p style="margin-top:16px;">
+      <a href="/region/{{ page.doShort | uri_escape }}/">{{ page.doShort }} 평생교육시설 전체 보기 →</a>
+    </p>
+  </div>
+
+  <!-- 우아동네 교차링크 -->
+  <div class="crosslink-box">
+    <a href="https://wooatown.wooahouse.com/지역/{{ page.doShort | uri_escape }}.html" target="_blank" rel="noopener" class="crosslink-link">
+      🏠 {{ page.doShort }} 다른 생활정보 보기 (우아동네) →
+    </a>
+  </div>
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "name": "{{ page.orgName | escape }}"{% if page.addr and page.addr != "" %},
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "{{ page.addr | escape }}",
+      "addressCountry": "KR"
+    }{% endif %}{% if page.tel and page.tel != "" %},
+    "telephone": "{{ page.tel | escape }}"{% endif %}{% if page.homepage and page.homepage != "" %},
+    "url": "{{ page.homepage | escape }}"{% endif %}
+  }
+  </script>
+
+</div>
+<aside class="tool-sidebar"></aside>
+</div>
+
+<script>
+(async () => {
+  const currentSlug = {{ page.slug | jsonify }};
+  const currentRegion = {{ page.doShort | jsonify }};
+  const currentSigungu = {{ page.sigungu | jsonify }};
+  const addr = {{ page.addr | jsonify }};
+
+  // 카카오맵 (주소 검색 기반 정적 임베드 - API키 불필요)
+  if (addr) {
+    const mapEl = document.getElementById('map');
+    if (mapEl) {
+      mapEl.innerHTML = `<iframe src="https://map.kakao.com/?q=${encodeURIComponent(addr)}" style="width:100%;height:100%;border:0;border-radius:10px;" loading="lazy"></iframe>`;
+    }
+  }
+
+  try {
+    const resp = await fetch('/search_index.json');
+    const all = await resp.json();
+
+    const regionFacilities = all
+      .filter(f => f.doShort === currentRegion && f.slug !== currentSlug)
+      .sort((a,b) => (a.sigungu === currentSigungu ? -1 : 1))
+      .slice(0, 6);
+
+    if (regionFacilities.length > 0) {
+      document.getElementById('regionCampsGrid').innerHTML = regionFacilities.map(facilityCard).join('');
+    }
+  } catch(e) {}
+
+  function facilityCard(f) {
+    return `<a class="camp-card" href="/facility/${f.slug}/">
+      <div class="camp-card-img-placeholder">🎓</div>
+      <div class="camp-card-body">
+        <div class="camp-card-name">${f.orgName}</div>
+        <div class="camp-card-loc">📍 ${f.sigungu || f.doShort || ''}</div>
+        <div class="camp-card-tags"><span class="tag tag-type">${f.type || ''}</span></div>
+      </div>
+    </a>`;
+  }
+})();
+</script>

@@ -1,0 +1,30 @@
+title: 우아에듀 - 전국 평생교육시설 정보
+description: >-
+  전국 평생교육원·원격평생교육시설·문화센터 등 평생교육시설의 정부(교육청) 등록 정보를
+  이름·지역으로 검색. 정식 등록 여부, 주소, 연락처, 학력인정 여부까지 한눈에.
+url: "https://wooaedu.wooahouse.com"
+baseurl: ""
+lang: ko
+timezone: Asia/Seoul
+author: WooaHouse
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+plugins:
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - scripts/
+  - "*.py"
+  - "*.log"
+  - "*.txt"
+  - README.md
+  - .gitignore
+  - vendor/
+  - _rawdata/
