@@ -60,6 +60,10 @@ def extract_sigungu(addr: str) -> str:
     return ""
 
 
+# 운영 주체의 삭제 요청으로 제외하는 시설 (시설명, 주소 일부) — 2026-11-16 컬처코리아 요청
+MANUAL_EXCLUDE = [("주니어앰배서더 원격평생교육시설", "청파로 48")]
+
+
 def process_facilities():
     raw = json.loads(FAC_RAW.read_text(encoding="utf-8"))
     items = []
@@ -69,6 +73,8 @@ def process_facilities():
             continue
         name = (d.get("FLCT_NM") or "").strip()
         if not name:
+            continue
+        if any(name == n and a in ((d.get("LCTN_ROAD_NM_ADDR") or "") + (d.get("LCTN_LOTNO_ADDR") or "")) for n, a in MANUAL_EXCLUDE):
             continue
         addr = (d.get("LCTN_ROAD_NM_ADDR") or "").strip() or (d.get("LCTN_LOTNO_ADDR") or "").strip()
         do_full = (d.get("CTPV_NM") or "").strip()
